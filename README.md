@@ -1,2 +1,2 @@
 # Livraria
-modelagens de banco de dados
+Database project developed using SQL server management studios

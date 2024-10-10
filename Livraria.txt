@@ -1,0 +1,176 @@
+create database livraria
+
+
+create table Cliente(
+
+cod_cliente int,
+nome varchar(250) NOT NULL,
+email varchar(250) UNIQUE,
+tel_1 varchar(20) NOT NULL,
+tel_2 varchar(20),
+rua varchar(250),
+bairro varchar(250),
+cidade varchar(250),
+estado varchar(250),
+
+CONSTRAINT pk_cliente PRIMARY KEY (cod_cliente)
+);
+
+create table PessoaFisica(
+
+cod_cliente int,
+rg varchar(250) UNIQUE NOT NULL,
+cpf varchar(250) UNIQUE NOT NULL,
+
+FOREIGN KEY (cod_cliente) REFERENCES Cliente(cod_cliente)
+);
+
+create table PessoaJuridica(
+
+cod_cliente int,
+cnpj varchar(250) UNIQUE NOT NULL,
+
+FOREIGN KEY (cod_cliente) REFERENCES Cliente(cod_cliente)
+);
+
+create table Pedido(
+
+cod_pedido int,
+cod_cliente int NOT NULL,
+data date NOT NULL,
+valor_pedido decimal NOT NULL,
+
+CONSTRAINT pk_pedido PRIMARY KEY (cod_pedido),
+FOREIGN KEY (cod_cliente) REFERENCES Cliente(cod_cliente)
+);
+
+create table Editora(
+
+cod_editora int,
+tel_1 varchar(20) NOT NULL,
+tel_2 varchar(20),
+nome_contato varchar(250) NOT NULL,
+email varchar(250) UNIQUE,
+
+CONSTRAINT pk_editora PRIMARY KEY (cod_editora)
+);
+
+create table Livro(
+
+cod_livro int,
+cod_editora int NOT NULL,
+valor decimal NOT NULL,
+ano_publicacao int NOT NULL,
+titulo varchar(250) NOT NULL,
+autor varchar(250) NOT NULL,
+isbn varchar(250) NOT NULL,
+
+CONSTRAINT pk_livro PRIMARY KEY (cod_livro),
+FOREIGN KEY (cod_editora) REFERENCES Editora(cod_editora)
+);
+
+create table Estoque(
+
+cod_editora int NOT NULL,
+cod_livro int NOT NULL,
+qtd_estoque int NOT NULL,
+
+FOREIGN KEY (cod_editora) REFERENCES Editora(cod_editora),
+FOREIGN KEY (cod_livro) REFERENCES Livro(cod_livro)
+);
+
+create table ItemPedido(
+
+cod_pedido int NOT NULL,
+cod_livro int NOT NULL,
+qtd_pedido int NOT NULL,
+valor_item decimal NOT NULL,
+
+PRIMARY KEY (cod_pedido, cod_livro),
+FOREIGN KEY (cod_pedido) REFERENCES Pedido(cod_pedido),
+FOREIGN KEY (cod_livro) REFERENCES Livro(cod_livro)
+);
+
+-- Inserindo dados na tabela Cliente
+INSERT INTO Cliente (cod_cliente, nome, email, tel_1, tel_2, rua, bairro, cidade, estado)
+VALUES 
+    (1, 'João Silva', 'joao@email.com', '123-4567', '789-0123', 'Rua A', 'Centro', 'São Paulo', 'SP'),
+    (2, 'Maria Santos', 'maria@email.com', '234-5678', NULL, 'Avenida B', 'Bairro X', 'Rio de Janeiro', 'RJ'),
+    (3, 'Pedro Oliveira', 'pedro@email.com', '345-6789', '901-2345', 'Rua C', 'Bairro Y', 'Belo Horizonte', 'MG'),
+	(4, 'Ana Oliveira', 'ana@email.com', '456-7890', '789-0123', 'Rua D', 'Bairro Z', 'Porto Alegre', 'RS'),
+    (5, 'Carlos Santos', 'carlos@email.com', '567-8901', NULL, 'Avenida E', 'Bairro W', 'Curitiba', 'PR'),
+    (6, 'Mariana Silva', 'mariana@email.com', '678-9012', '012-3456', 'Rua F', 'Bairro V', 'Salvador', 'BA'),
+    (7, 'Lucas Pereira', 'lucas@email.com', '789-0123', '123-4567', 'Avenida G', 'Bairro U', 'Recife', 'PE'),
+    (8, 'Fernanda Oliveira', 'fernanda@email.com', '890-1234', NULL, 'Rua H', 'Bairro T', 'Fortaleza', 'CE'),
+    (9, 'Gabriel Santos', 'gabriel@email.com', '901-2345', '234-5678', 'Avenida I', 'Bairro S', 'Manaus', 'AM'),
+    (10, 'Juliana Silva', 'juliana@email.com', '012-3456', '345-6789', 'Rua J', 'Bairro R', 'Brasília', 'DF');
+
+-- Inserindo dados na tabela PessoaFisica referenciando a tabela Cliente
+INSERT INTO PessoaFisica (cod_cliente, rg, cpf)
+VALUES 
+    (1, '1234567', '98765432100'),
+    (3, '2345678', '87654321011'), -- Aqui utilizamos o código 3, correspondente ao cliente Pedro Oliveira (cod_cliente = 3)
+	(4, '3456789', '76543210987'),
+    (5, '4567890', '65432109876'),
+    (6, '5678901', '54321098765'),
+    (7, '6789012', '43210987654');
+
+-- Inserindo dados na tabela PessoaJuridica referenciando a tabela Cliente
+INSERT INTO PessoaJuridica (cod_cliente, cnpj)
+VALUES 
+    (2, '12345678901234'), -- Aqui utilizamos o código 2, correspondente à cliente Maria Santos (cod_cliente = 2)
+    (3, '34567890123456'), -- Aqui utilizamos o código 3, correspondente à cliente Pedro Oliveira (cod_cliente = 3)
+	(8, '98765432109876'),
+    (9, '87654321098765'),
+    (10, '76543210987654');
+
+	-- Inserindo dados na tabela Editora
+INSERT INTO Editora (cod_editora, tel_1, tel_2, nome_contato, email)
+VALUES 
+    (1, '111-2222', '333-4444', 'Maria Editora', 'contato@editora.com'),
+    (2, '222-3333', NULL, 'João Livros', 'joao@livros.com'),
+	(3, '333-5555', NULL, 'Carlos Publicações', 'carlos@publicacoes.com'),
+    (4, '444-6666', '555-7777', 'Fernanda Livros', 'fernanda@livros.com');
+
+
+-- Inserindo dados na tabela Livro referenciando a tabela Editora
+INSERT INTO Livro (cod_livro, cod_editora, valor, ano_publicacao, titulo, autor, isbn)
+VALUES 
+    (1, 1, 29.99, 2020, 'A Arte da Guerra', 'Sun Tzu', '9788573260763'),
+    (2, 2, 19.99, 2018, 'O Senhor dos Anéis', 'J.R.R. Tolkien', '9788578271518'),
+	(3, 3, 39.99, 2021, 'A Revolta dos Livros', 'Ana Escritora', '9788573260764'),
+    (4, 4, 49.99, 2019, 'O Código dos Escritores', 'Carlos Autor', '9788578271519');
+
+-- Inserindo dados na tabela Estoque referenciando a tabela Editora e Livro
+INSERT INTO Estoque (cod_editora, cod_livro, qtd_estoque)
+VALUES 
+    (1, 1, 50), -- Livro 'A Arte da Guerra' da Editora 1
+    (2, 2, 30), -- Livro 'O Senhor dos Anéis' da Editora 2
+	(3, 3, 20),
+    (4, 4, 15);
+
+-- Inserindo dados na tabela Pedido referenciando a tabela Cliente
+INSERT INTO Pedido (cod_pedido, cod_cliente, data, valor_pedido)
+VALUES 
+    (1, 1, '2023-01-15', 59.98), -- Pedido para o cliente João Silva (cod_cliente = 1)
+    (2, 3, '2023-02-20', 19.99), -- Pedido para o cliente Pedro Oliveira (cod_cliente = 3)
+    (3, 4, '2023-03-10', 89.98),
+    (4, 6, '2023-04-05', 59.99);
+
+-- Inserindo dados na tabela ItemPedido referenciando a tabela Pedido e Livro
+INSERT INTO ItemPedido (cod_pedido, cod_livro, qtd_pedido, valor_item)
+VALUES 
+    (1, 1, 2, 59.98), -- Pedido 1 com livro 'A Arte da Guerra'
+    (2, 2, 1, 19.99), -- Pedido 2 com livro 'O Senhor dos Anéis'
+	(3, 3, 2, 79.98),
+    (4, 4, 1, 59.99);
+
+
+SELECT 'cliente' AS Tabela, * FROM cliente;
+SELECT 'PessoaFisica' AS Tabela, * FROM PessoaFisica;
+SELECT 'PessoaJuridica' AS Tabela, * FROM PessoaJuridica;
+SELECT 'Pedido' AS Tabela, * FROM Pedido;
+SELECT 'Editora' AS Tabela, * FROM Editora;
+SELECT 'Livro' AS Tabela, * FROM Livro;
+SELECT 'Estoque' AS Tabela, * FROM Estoque;
+SELECT 'ItemPedido' AS Tabela, * FROM ItemPedido;
